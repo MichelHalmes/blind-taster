@@ -2,16 +2,14 @@
 import React from 'react';
 import { connect } from 'react-redux'
 
-
-// import Home from './Home.js'
+import Home from './Home.js'
 import Login from './Login.js'
 
 
 class App extends React.Component {
   render() {
     if (this.props.username) {
-      return <Login />
-      // return <Home />
+      return <Home />
     } else {
       return <Login />
     }

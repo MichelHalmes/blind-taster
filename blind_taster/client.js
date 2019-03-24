@@ -1,6 +1,6 @@
 
 
-const SERVER_HOST_PORT = 'http://10.0.0.5:3000'
+const SERVER_HOST_PORT = 'http://192.168.8.101:3000'
 
 
 function checkStatus(response) {
