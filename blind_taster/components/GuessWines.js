@@ -4,7 +4,8 @@ import {
   Button,
   Text,
   Spinner,
-  H3
+  H3,
+  Icon
 } from 'native-base';
 
 import { View } from 'react-native'
@@ -20,8 +21,8 @@ import { nextPhaseAC, resetUsernameAC } from '../my_redux.js'
 class GuessWines extends React.Component {
   constructor(props) {
     super(props)
-    this.tags = []
-    this.wines_ordered = []
+    this.tags = null
+    this.wines_ordered = null
     this.state = {data: {}}
   }
 
@@ -65,12 +66,21 @@ class GuessWines extends React.Component {
   }
 
   render() {
-    if (this.tags.length == 0) {
+    if (this.tags === null) {
       return(
         <View style={{justifyContent: "center", alignItems: "center"}}>
           <Spinner />
           <H3 style={{textAlign: 'center'}}>
             Waiting for new round to start!
+          </H3>
+        </View>
+      )
+    } else if (this.tags.length == 0) {
+      return (
+        <View style={{ justifyContent: "center", alignItems: "center", marginTop: 10 }}>
+          <Icon name='md-trophy' />
+          <H3 style={{ textAlign: 'center' }}>
+            Game over!
           </H3>
         </View>
       )

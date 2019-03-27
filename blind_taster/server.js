@@ -80,10 +80,10 @@ app.post('/api/login', function (req, res) {
 })
 
 app.get('/api/wines_tags', function (req, res) {
-  // if (CURR_ROUND > NB_ROUNDS) {
-  // TODO: handle end of game
-  //   res.json({wines: [], tags: []})
-  // }
+  if (CURR_ROUND > NB_ROUNDS) {
+    // End of game
+    return res.json({wines: [], tags: []})
+  }
   const wines_to_guess = WINES
     .filter(wine => Object.values(TAGS).indexOf(wine) < 0 )
   const tags_to_guess = Object.keys(TAGS)
