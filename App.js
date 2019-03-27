@@ -17,7 +17,6 @@ export default class App extends React.Component {
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
     });
     this.setState({ isReady: true });
-    console.log("Finished loading fonts!")
   }
 
   render() {

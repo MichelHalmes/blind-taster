@@ -10,7 +10,7 @@ function checkStatus(response) {
     console.log('Client Error:', response.status, response.url);
     let error = new Error(response.statusText);
     error.response = response;
-    throw error; // TODO: erros do not get handled properly on the client side
+    throw error; // TODO: errors do not get handled properly on the client side
   }
 }
 
@@ -85,8 +85,6 @@ function getPoints(username) {
     .then(checkStatus)
     .then((response) => response.json())
 }
-
-
 
 
 export default {

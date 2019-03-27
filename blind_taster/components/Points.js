@@ -34,7 +34,6 @@ class Points extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.props)
     client.getPoints(this.props.username)
       .then(res => {
         this.setState({points: res.points, summary: res.summary, ranking: res.ranking})

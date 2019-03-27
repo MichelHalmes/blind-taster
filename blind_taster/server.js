@@ -17,20 +17,30 @@ app.use(function (req, res, next) {
   next()
 })
 
-// ===== STATE =====
 
+// ===== CONFIG =====
+const HAS_PAHANTOM_WINE = true // one wine in the list is actually not present
+const WINES = ['Pinot Noir (75R)', 'Pinot Noir (150R)', 'Pinot Noir (225R)']
+
+// ===== CONSTANTS =====
 const PHASES = {
   GUESS: 'guess',
   REVEAL: 'reveal'
 }
-
-const WINES = ['Pinot Noir (75R)', 'Pinot Noir (150R)', 'Pinot Noir (225R)', 'Pinot Noir (300R)']
-
-const NB_ROUNDS = 4 // Number of actual bottles in the game
+const PHANTOM_TAG = 'X'
 
 // ===== STATE =====
 
-let TAGS = {'1': null, '2': null, '3': null, '4': null} //, 'X': null}
+// TAGS = {'1': null, '2': null, '3': null} //, 'X': null}
+let TAGS = _.range(WINES.length)
+  .reduce((acc, idx) => {
+    key = (HAS_PAHANTOM_WINE && idx+1==WINES.length) ? PHANTOM_TAG : idx+1
+    acc[key] = null
+    return acc
+  }, {})
+
+const NB_ROUNDS = Object.keys(TAGS).length - 1 // the last guess is trivial
+
 let PLAYERS = {
   // 'Mich':{
   //   points: 4,
@@ -49,6 +59,7 @@ let PLAYERS = {
   //     'X': 'Cabernet Sauvignon'
   //   }]}
 }
+
 let CURR_ROUND = 1
 let CURR_PHASE = PHASES.GUESS
 let CURR_REVEAL_TAG = null
@@ -56,7 +67,7 @@ let CURR_REVEAL_TAG = null
 // ===== ENDPOINTS =====
 
 
-app.post('/api/login', function (req, res, next) {
+app.post('/api/login', function (req, res) {
   const username = _.trim(req.body.username).toLowerCase()
   let already_exists
   if (PLAYERS[username]) {
@@ -66,10 +77,13 @@ app.post('/api/login', function (req, res, next) {
     PLAYERS[username] = {points: 0, guesses: []}
   }
   res.json({already_exists})
-  next()
 })
 
-app.get('/api/wines_tags', function (req, res, next) {
+app.get('/api/wines_tags', function (req, res) {
+  // if (CURR_ROUND > NB_ROUNDS) {
+  // TODO: handle end of game
+  //   res.json({wines: [], tags: []})
+  // }
   const wines_to_guess = WINES
     .filter(wine => Object.values(TAGS).indexOf(wine) < 0 )
   const tags_to_guess = Object.keys(TAGS)
@@ -78,10 +92,9 @@ app.get('/api/wines_tags', function (req, res, next) {
     wines: wines_to_guess,
     tags: tags_to_guess
   })
-  next()
 })
 
-app.post('/api/guess', function (req, res, next) {
+app.post('/api/guess', function (req, res) {
   const username = _.trim(req.body.username).toLowerCase()
   let guess = req.body.guess
   if (PLAYERS[username] === undefined) {
@@ -89,7 +102,7 @@ app.post('/api/guess', function (req, res, next) {
   }
 
   guess = Object.keys(guess).reduce((acc, tag) => {
-    if (tag!='X' && TAGS[tag]===null){
+    if (tag!=PHANTOM_TAG && TAGS[tag]===null){
       acc[tag] = guess[tag]
     }
     return acc
@@ -175,7 +188,20 @@ app.post('/api/reveal_tag', function (req, res, next) {
   CURR_REVEAL_TAG =  null
   CURR_PHASE = PHASES.GUESS
   TAGS[tag] = wine
-
+  
+  if (CURR_ROUND == NB_ROUNDS) {
+    // Find the trivial guess
+    let missing_tags = Object.keys(TAGS).filter(tag => TAGS[tag]===null)
+    if (missing_tags.length != 1) {
+      return res.status(500).send(`Expected exactly one missing tag in the last round: ${missing_tags}`);
+    }
+    let missing_wines = WINES.filter(wine => Object.values(TAGS).indexOf(wine) == -1)
+    if (missing_wines.length != 1) {
+      return res.status(500).send(`Expected exactly one missing wine in the last round: ${missing_wines}`);
+    }
+    TAGS[missing_tags[0]] = missing_wines[0]
+  }
+  
   Object.values(PLAYERS).forEach(player => {
     const total_points = player.guesses
       .map((guess, round) =>

@@ -26,7 +26,7 @@ class Main extends React.Component {
   static navigationOptions = ({navigation}) => ({
     title: 'App',
     headerLeft: (
-      <Button transparent onPress={() => navigation.navigate('Points')} style={{marginTop: 20}}>
+      <Button transparent onPress={() => navigation.navigate('Points')} style={{marginTop: 10}}>
         <Icon name='md-trophy' />
       </Button>
     )
