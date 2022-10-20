@@ -8,7 +8,7 @@
     "server": "nodemon ./blind_taster/server.js --watch ./blind_taster/server.js --exec babel-node"
   },
   "dependencies": {
-    "expo": "^32.0.0",
+    "expo": "^46.0.16",
     "native-base": "^2.12.1",
     "react": "16.5.0",
     "react-mixin": "^5.0.0",
